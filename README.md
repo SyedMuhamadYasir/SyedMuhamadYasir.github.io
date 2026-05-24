@@ -389,60 +389,232 @@ Three clean outer blind-test repeats are already far better than zero.
 Claudio’s concern was basically:
 “tell me why this time window makes sense.”
 
-Since there is not enough time to build new windows, the goal this week is:
+The good news is:
 
-**make the justification stronger in writing, not by pretending we did new windows.**
+**we are not stuck.**
 
-## What can be strengthened right now
+We do **not** need a new dataset or full window-sensitivity experiments to make the time-window justification much stronger.
 
-### A. Add a clearer protocol-timeline explanation
-Say plainly:
+The key idea is:
 
-- Protocol 22 went live on Stellar Mainnet on **2024-12-05**
-- the paper window starts on **2024-12-30**
-- the paper window ends on **2025-02-15**
-- so the entire submitted window lies inside one **post-Protocol-22, pre-Protocol-23** regime
+**stop treating the time-window justification as only one sentence about protocol dates.**
+Instead, turn it into a small, grounded argument with several pieces of evidence.
 
-This is the cleanest scientific reason for the chosen slice.
+That is realistic this week.
 
-### B. Say explicitly that the window avoids mixing regimes
-The stronger wording is:
-the chosen window avoids mixing pre-upgrade and post-upgrade behavior.
+## Strongest framing
 
-### C. If true in your data, say explicitly that labels begin on 2024-12-30
-If your usable graph-matched labels effectively begin there, say so clearly.
+The current window, **2024-12-30 to 2025-02-15**, already has one major strength:
 
-That makes the window look less arbitrary and more constrained by:
-- label availability
-- and single-regime coherence
+- it lies fully inside a **single protocol regime**
 
-### D. Add one short “why 48 days” sentence
-Good reasons:
+That matters because:
+- Protocol 22 went live on Mainnet on **2024-12-05**
+- Protocol 23 / Whisk arrived only on **2025-09-03**
+- Protocol 24 arrived on **2025-10-22**
+- Protocol 25 arrived on **2026-01-22**
+
+So the submitted slice does **not** mix regimes.
+
+This is a methodological strength, not an apology.
+
+Better still:
+- Protocol 23 introduced meaningful changes such as unified events and state archival
+- Protocol 24 was a stability-oriented upgrade after Whisk
+- Protocol 25 introduced further network changes
+
+That helps justify why the first paper deliberately stayed inside one regime.
+
+## The basic story we want
+
+> We chose a single-regime post-Protocol-22 slice on purpose, to avoid mixing materially different protocol environments.
+
+That is stronger than just saying “it was after Protocol 22.”
+
+## What can be strengthened this week
+
+### A. Make the protocol argument sharper
+Add all of the following ideas:
+
+- protocol upgrades can change network behavior and data-generation conditions
+- later protocols introduced new network capabilities and stability changes
+- mixing pre- and post-upgrade behavior would have muddied interpretation
+- therefore, staying inside one regime was the cleaner first design choice
+
+### B. Point out the post-upgrade buffer
+This is a strong point and should be said clearly.
+
+The submitted window starts **25 days after** Protocol 22 went live.
+
+That means:
+- the window does **not** start on upgrade day
+- it starts after a short settling period
+- this reduces the chance that we are measuring immediate upgrade turbulence instead of normal post-upgrade behavior
+
+### C. Add a label-availability justification
+If true in the data pipeline, say clearly:
+
+- usable graph-matched trusted labels begin on **2024-12-30**
+
+That means the window was constrained by the intersection of:
+
+1. **label availability**
+2. **single-regime coherence**
+3. **tractable graph scale**
+
+This is a much stronger justification than sounding arbitrary.
+
+### D. Add a “why 48 days?” sentence
+The clean reasons are:
+
 - long enough to produce a large connected graph
 - short enough to remain computationally tractable
-- short enough to stay within one stable protocol regime
+- short enough to stay inside one stable protocol regime
 
-### E. Add a tiny timeline figure or one-row table if there is room
+### E. Add a tiny timeline figure or one-row table
 Very simple:
+
 - Protocol 22 date
-- chosen window
+- chosen window start
+- chosen window end
 - Protocol 23 date
 
-That visually answers a big part of the concern without new experiments.
+This visually answers a big part of the concern.
 
-## What should NOT be claimed
+## Stronger optional grounding using the same data
+
+These do **not** require new windows.
+These use the existing 48-day data only.
+
+### F. Add an in-window stability check
+Using the existing 48-day data, compute simple daily descriptive series such as:
+
+- daily transaction count
+- daily active account count
+- daily unique edges or payment flows
+- daily scam-labeled activity count, if easy
+- daily proportion of activity touching labeled nodes, if easy
+
+What this helps show:
+
+- the sample is not a one-day spike pretending to be a study
+- the network is active throughout the interval
+- the window looks like a meaningful observational slice
+
+### G. Add a concentration check
+Compute something simple like:
+
+- share of total transactions contributed by the busiest day
+- share of total active nodes contributed by the busiest day
+- maybe share contributed by the busiest week
+
+Why this helps:
+
+- if one day dominates the whole sample, the window looks fragile
+- if no single day dominates, the window looks more representative
+
+This is a very reviewer-friendly sanity check.
+
+### H. Add a first-half vs second-half descriptive comparison
+Split the 48-day window into two 24-day halves and compare **descriptive stats only**, such as:
+
+- transactions
+- active nodes
+- maybe labeled-node support
+- maybe SCAM/NON-SCAM support counts, if easy
+
+The goal is **not** to rerun the model twice.
+The goal is to show:
+
+- the window does not look like two totally different worlds glued together
+
+If the halves are broadly comparable, that strengthens the justification.
+If they differ somewhat, that is still okay. You can say the window shows normal within-window variation, not a regime break.
+
+### I. Add a clearer scope statement
+Add a sentence like:
+
+> This paper does not claim temporal generalization across all Stellar regimes. It studies a single, label-available, post-Protocol-22, pre-Protocol-23 regime and treats broader temporal robustness as future work.
+
+This helps because it makes the claim smaller, cleaner, and more honest.
+
+## What should NOT be claimed this week
+
 Do **not** claim:
 - window sensitivity
 - robustness across multiple windows
 - cross-protocol generalization
 
-unless you actually ran those experiments.
+unless those experiments were actually run.
 
-Correct this week:
+This week the correct move is:
+
 - strengthen justification
+- add lightweight descriptive grounding
 - do not fake new evidence
 
----
+## What I recommend doing this week
+
+If the goal is to strengthen the time-window justification quickly, do these four things:
+
+### 1. Rewrite the protocol-justification paragraph
+Add:
+- single-regime rationale
+- 25-day post-upgrade buffer
+- label-availability rationale
+- tractability rationale
+
+### 2. Add one simple figure
+Best options:
+- daily transaction count
+- daily active account count
+- maybe both if the figure stays clean
+
+This is probably the best single new grounding figure.
+
+### 3. Add one tiny summary table
+Example rows:
+- total days
+- median daily transactions
+- max-day transaction share
+- median daily active nodes
+- max-day active-node share
+- maybe first-half vs second-half totals
+
+This makes the window look characterized, not arbitrary.
+
+### 4. Add one sentence in limitations / future work
+Say clearly:
+- broader cross-window and cross-regime sensitivity remains future work
+
+That keeps the paper honest.
+
+## The exact logic chain to use in the paper
+
+1. We needed a window where trusted labels were available in usable graph-aligned form.
+2. We wanted to avoid mixing protocol regimes.
+3. We therefore selected a post-Protocol-22, pre-Protocol-23 interval.
+4. We did not start on upgrade day itself, but after a short settling period.
+5. The chosen 48-day slice is large enough to produce a meaningful graph, but still computationally tractable.
+6. Simple descriptive checks show that the window is not dominated by one isolated burst.
+7. Broader temporal sensitivity remains future work.
+
+That is grounded.
+That is honest.
+That is much stronger than a one-line protocol-date excuse.
+
+## Final message for Jasur
+
+Jasur does **not** need to run new windows this week.
+
+He only needs to help, if possible, with lightweight descriptive summaries from the **existing 48-day data**, such as:
+- daily counts
+- concentration checks
+- first-half vs second-half descriptive comparisons
+
+The main improvement is still in the **writing and framing**, not in pretending we ran a full temporal-robustness study.
+
+
 
 # 11. What to cut or compress in the paper to make room
 
