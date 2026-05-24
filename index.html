@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Stellar Sprint Zoom Handoff</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:900px;margin:40px auto;line-height:1.5;padding:0 20px}
+code,pre{font-family:Consolas,monospace;background:#f4f4f4}
+pre{padding:12px;overflow:auto;border-radius:8px}
+h1,h2,h3{line-height:1.2}
+</style>
+</head>
+<body>
+<h1>STELLAR SPRINT — ZOOM HANDOFF FOR JASUR</h1>
+<p>Use this file for the Zoom call. It is the short version.</p>
+<h2>Goal this week</h2>
+<p>We are NOT rewriting the whole paper. We are making the current paper stronger in the fastest, safest way.</p>
+<h2>What to skip this week</h2>
+<ul>
+<li>old internal embedding diagnostics</li>
+<li>old masking pipeline</li>
+<li>old masked-only evaluation</li>
+<li>full window sensitivity</li>
+</ul>
+<p>These are secondary or too expensive for this week.</p>
+<h2>What to do this week</h2>
+<h3>1. Rerun the current submitted holdout pipeline</h3>
+<p>Run from:<br><code>Community Detection/SSLPA/manual/normalized/ncsf/helpers/</code></p>
+<pre>python run_submitted_holdout_pipeline.py</pre>
+<p>If that wrapper fails, run:</p>
+<pre>python 3_prepare_fixed_test_split.py
+python 4_prepare_dev_repeats.py
+python 5_run_sslpa_dev_repeats.py
+python 6_evaluate_dev_repeats_binary.py
+python 7_evaluate_dev_repeats_multiclass.py
+python 8_choose_final_thresholds.py
+python 9_run_final_dev_sslpa_and_test.py
+python 10_report_flagged_risky_addresses.py</pre>
+<h3>2. Generate the fast new outputs</h3>
+<pre>python 12_plot_binary_tradeoff.py
+python 13_summarize_threshold_stability.py
+python 17_run_filter_ablation.py
+python 19_build_review_artifact_pack.py</pre>
+<h3>3. Run binary outer robustness</h3>
+<p>Start with 3:</p>
+<pre>python 14_run_outer_split_sensitivity.py --n-outer-splits 3
+python 15_aggregate_outer_split_results.py</pre>
+<p>If runtime is okay, go to 5:</p>
+<pre>python 14_run_outer_split_sensitivity.py --n-outer-splits 5
+python 15_aggregate_outer_split_results.py</pre>
+<h3>4. Optional small ranking extension</h3>
+<p>Only if the first three parts are working cleanly:</p>
+<pre>python 20_compute_continuous_risk_scores.py
+python 21_evaluate_continuous_risk_ranking.py
+python 22_plot_pr_curve_risk_score.py</pre>
+<h2>Why these things matter</h2>
+<ul>
+<li>Binary tradeoff figure: shows low coverage is a deliberate screening tradeoff, not a bug.</li>
+<li>Threshold stability: shows the filter is not a random lucky setting.</li>
+<li>Ablation: shows NCRF is more than one trivial threshold.</li>
+<li>Outer robustness: strongest answer to "one lucky split?" or "too preliminary?"</li>
+<li>Risk score: optional ranking add-on for top-k shortlist / PR curve.</li>
+</ul>
+<h2>Time-window issue</h2>
+<p>This week we do NOT run full new windows. Instead, we strengthen the writing:</p>
+<ul>
+<li>single-regime post-Protocol-22, pre-Protocol-23 slice</li>
+<li>starts after a short post-upgrade buffer</li>
+<li>earliest usable graph-matched labels begin here</li>
+<li>long enough for a meaningful graph, short enough to stay tractable</li>
+</ul>
+<h2>What to send back after running</h2>
+<ul>
+<li>final metric CSVs</li>
+<li>binary tradeoff figure(s)</li>
+<li>threshold stability outputs</li>
+<li>ablation outputs</li>
+<li>outer robustness summaries</li>
+<li>optional risk-score outputs</li>
+</ul>
+<p>Then we will cut the weak sections from the paper and insert the strong new ones.</p>
+</body>
+</html>
