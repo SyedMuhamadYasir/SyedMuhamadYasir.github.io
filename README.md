@@ -98,7 +98,7 @@ Just send the folders below.
 ### Also send one tiny text note
 Just say:
 - baseline rerun: yes / no
-- outer splits: 3 / 5 / not run
+- outer splits: 3 / 5 / 10
 - risk score: yes / no
 - window descriptive checks: yes / no
 - anything broke badly: yes / no, and what
