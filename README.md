@@ -1,3 +1,110 @@
+# THIS WEEK ONLY — JASUR EXECUTION BLOCK
+
+This block is the only part Jasur needs to follow first.
+
+## Do NOT run this week
+- old internal embedding diagnostics
+- old masking pipeline
+- old masked-only evaluation
+- `16_run_window_sensitivity.py`
+- any new-window experiments
+- any major baseline retuning
+
+## Run order
+
+### 1. Baseline rerun
+Run from:
+`Community Detection/SSLPA/manual/normalized/ncsf/helpers/`
+
+Try the wrapper first:
+```bash
+python run_submitted_holdout_pipeline.py
+```
+
+If the wrapper fails, run:
+```bash
+python 3_prepare_fixed_test_split.py
+python 4_prepare_dev_repeats.py
+python 5_run_sslpa_dev_repeats.py
+python 6_evaluate_dev_repeats_binary.py
+python 7_evaluate_dev_repeats_multiclass.py
+python 8_choose_final_thresholds.py
+python 9_run_final_dev_sslpa_and_test.py
+python 10_report_flagged_risky_addresses.py
+```
+
+Optional debug only:
+```bash
+python 11_compute_risky_overlap.py
+```
+
+### 2. Fast high-value outputs
+```bash
+python 12_plot_binary_tradeoff.py
+python 13_summarize_threshold_stability.py
+python 17_run_filter_ablation.py
+python 19_build_review_artifact_pack.py
+```
+
+### 3. Time-window descriptive grounding using the SAME 48-day data
+Only run this if the raw 48-day transaction-level file is readily available.
+
+```bash
+python 23_window_descriptive_checks.py --tx-file /ABS/PATH/TO/current_48d_transactions.csv --labels-csv /ABS/PATH/TO/labeled_nodes_in_graph.csv --out-dir ./window_descriptive_checks
+```
+
+If the raw transaction file path is unclear or would take real detective work, skip this for now.
+
+### 4. Binary outer robustness
+Start with 3:
+```bash
+python 14_run_outer_split_sensitivity.py --n-outer-splits 3
+python 15_aggregate_outer_split_results.py
+```
+
+If runtime is okay, go to 5:
+```bash
+python 14_run_outer_split_sensitivity.py --n-outer-splits 5
+python 15_aggregate_outer_split_results.py
+```
+
+### 5. Optional small ranking extension
+Only if everything above is already clean:
+```bash
+python 20_compute_continuous_risk_scores.py
+python 21_evaluate_continuous_risk_ranking.py
+python 22_plot_pr_curve_risk_score.py
+```
+
+## Files to send back to Yasir
+
+Do **not** hand-pick random files unless something broke.
+Just send the folders below.
+
+### Always send these folders
+- `OUT_ROOT/step7_holdout/final_test/`
+- `OUT_ROOT/step8_review_assets/`
+
+### If outer robustness was run, also send
+- `OUT_ROOT/outer_sensitivity/`
+
+### If risk score was run, also send
+- `OUT_ROOT/risk_score/`
+
+### If descriptive time-window checks were run, also send
+- `./window_descriptive_checks/` if you used the command above exactly
+- or the exact folder passed to `--out-dir`
+
+### Also send one tiny text note
+Just say:
+- baseline rerun: yes / no
+- outer splits: 3 / 5 / not run
+- risk score: yes / no
+- window descriptive checks: yes / no
+- anything broke badly: yes / no, and what
+
+---
+
 # STELLAR PAPER — DEADLINE-EXTENSION RUNBOOK FOR JASUR
 ## One file: what the paper is, what to run this week, what to skip, what the new code does, and all new code inline
 
@@ -21,96 +128,6 @@ The repo already contains the current submitted-paper helper chain.
 This file inlines **all newly added code** that sits on top of that existing repo code.
 
 ---
-
-# THIS WEEK ONLY — JASUR EXECUTION BLOCK
-
-This is the only part Jasur needs for the sprint.
-
-## Do NOT run this week
-- old internal embedding diagnostics
-- old masking pipeline
-- old masked-only evaluation
-- `16_run_window_sensitivity.py`
-- any new-window experiments
-- any major baseline retuning
-
-## What to run this week
-
-### 1. Baseline rerun
-Run from:
-
-`Community Detection/SSLPA/manual/normalized/ncsf/helpers/`
-
-Use the wrapper first:
-
-```bash
-python run_submitted_holdout_pipeline.py
-```
-
-If that fails, run the explicit chain:
-
-```bash
-python 3_prepare_fixed_test_split.py
-python 4_prepare_dev_repeats.py
-python 5_run_sslpa_dev_repeats.py
-python 6_evaluate_dev_repeats_binary.py
-python 7_evaluate_dev_repeats_multiclass.py
-python 8_choose_final_thresholds.py
-python 9_run_final_dev_sslpa_and_test.py
-python 10_report_flagged_risky_addresses.py
-```
-
-Optional debug only:
-
-```bash
-python 11_compute_risky_overlap.py
-```
-
-### 2. Fast high-value outputs
-
-```bash
-python 12_plot_binary_tradeoff.py
-python 13_summarize_threshold_stability.py
-python 17_run_filter_ablation.py
-python 19_build_review_artifact_pack.py
-```
-
-### 3. Binary outer robustness
-
-Start with 3:
-
-```bash
-python 14_run_outer_split_sensitivity.py --n-outer-splits 3
-python 15_aggregate_outer_split_results.py
-```
-
-If runtime is okay, go to 5:
-
-```bash
-python 14_run_outer_split_sensitivity.py --n-outer-splits 5
-python 15_aggregate_outer_split_results.py
-```
-
-### 4. Optional small risk-score extension
-Only if everything above is clean and there is still time:
-
-```bash
-python 20_compute_continuous_risk_scores.py
-python 21_evaluate_continuous_risk_ranking.py
-python 22_plot_pr_curve_risk_score.py
-```
-
-## Very short meaning of each new thing
-- Binary tradeoff figure = shows why lower coverage is a deliberate screening tradeoff
-- Threshold stability = shows thresholds are not random nonsense
-- Ablation = shows NCRF is more than one trivial threshold
-- Outer robustness = strongest answer to “one lucky split?”
-- Risk score = optional ranking add-on, not a new paper identity
-
-## Time-window work this week
-Do NOT run new windows.
-Only strengthen the writing and, if easy, compute cheap descriptive checks from the existing 48-day data.
-
 
 # 0. Deadline reality
 
@@ -282,6 +299,7 @@ These new files have already been written and are included inline below:
 - `20_compute_continuous_risk_scores.py`
 - `21_evaluate_continuous_risk_ranking.py`
 - `22_plot_pr_curve_risk_score.py`
+- `23_window_descriptive_checks.py`
 
 ## Important truth
 All of the new files above are already written.
@@ -416,6 +434,22 @@ python 19_build_review_artifact_pack.py
 ```
 
 These are the fastest useful upgrades.
+
+### E. Time-window descriptive grounding using the same 48-day data
+Only run this if the raw 48-day transaction-level file is readily available.
+
+```bash
+python 23_window_descriptive_checks.py --tx-file /ABS/PATH/TO/current_48d_transactions.csv --labels-csv /ABS/PATH/TO/labeled_nodes_in_graph.csv --out-dir ./window_descriptive_checks
+```
+
+What this produces:
+- daily transaction counts
+- daily active-account counts
+- concentration checks
+- first-half vs second-half descriptive comparison
+- simple plots for the paper or appendix
+
+If the raw transaction file path is unclear or would take real detective work, skip this for now and keep the time-window strengthening purely in the writing.
 
 ---
 
@@ -577,6 +611,12 @@ These do **not** require new windows.
 These use the existing 48-day data only.
 
 ### F. Add an in-window stability check
+Run this helper if the raw 48-day file is available:
+
+```bash
+python 23_window_descriptive_checks.py --tx-file /ABS/PATH/TO/current_48d_transactions.csv --labels-csv /ABS/PATH/TO/labeled_nodes_in_graph.csv --out-dir ./window_descriptive_checks
+```
+
 Using the existing 48-day data, compute simple daily descriptive series such as:
 
 - daily transaction count
@@ -2183,6 +2223,304 @@ if __name__ == "__main__":
 
 ```
 
+## `23_window_descriptive_checks.py`
+
+```python
+from __future__ import annotations
+
+import argparse
+from collections import Counter, defaultdict
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import pandas as pd
+
+
+DATE_CANDIDATES = [
+    "date", "day", "tx_date", "ledger_date", "close_time", "timestamp",
+    "created_at", "tx_timestamp", "operation_time",
+]
+SRC_CANDIDATES = [
+    "source", "source_account", "source_account_id", "from", "from_account", "sender", "src",
+]
+DST_CANDIDATES = [
+    "destination", "destination_account", "destination_account_id", "to", "to_account", "receiver", "dst", "target",
+]
+TXID_CANDIDATES = [
+    "tx_hash", "transaction_hash", "hash", "tx_id", "id",
+]
+LABEL_NODE_CANDIDATES = ["node_id", "account", "account_id", "address"]
+LABEL_VALUE_CANDIDATES = ["label", "predicted_label", "binary_label", "multiclass_label"]
+
+
+def detect_column(columns: list[str], candidates: list[str], user_value: str | None = None, required: bool = True) -> str | None:
+    if user_value:
+        if user_value in columns:
+            return user_value
+        raise ValueError(f"Requested column '{user_value}' not found. Available columns: {columns}")
+    lowered = {c.lower(): c for c in columns}
+    for cand in candidates:
+        if cand.lower() in lowered:
+            return lowered[cand.lower()]
+    if required:
+        raise ValueError(f"Could not detect required column. Tried {candidates}. Available columns: {columns}")
+    return None
+
+
+def load_labels(labels_csv: Path | None, node_col: str | None = None, label_col: str | None = None, scam_label: str = "SCAM") -> tuple[set[str], set[str]]:
+    if labels_csv is None:
+        return set(), set()
+    df = pd.read_csv(labels_csv)
+    cols = list(df.columns)
+    node_col = detect_column(cols, LABEL_NODE_CANDIDATES, node_col, required=True)
+    label_col = detect_column(cols, LABEL_VALUE_CANDIDATES, label_col, required=True)
+    df = df[[node_col, label_col]].dropna().copy()
+    df[node_col] = df[node_col].astype(str)
+    df[label_col] = df[label_col].astype(str)
+    labeled_nodes = set(df[node_col])
+    scam_nodes = set(df.loc[df[label_col] == scam_label, node_col])
+    return labeled_nodes, scam_nodes
+
+
+def load_tx_iter(tx_file: Path, chunksize: int) -> tuple[iter, bool]:
+    suffix = tx_file.suffix.lower()
+    if suffix in {".parquet", ".pq", ".parq"}:
+        df = pd.read_parquet(tx_file)
+        return iter([df]), False
+    if suffix in {".csv", ".txt"}:
+        return pd.read_csv(tx_file, chunksize=chunksize), True
+    raise ValueError(f"Unsupported transaction file type: {tx_file}")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--tx-file", required=True)
+    parser.add_argument("--labels-csv", default=None)
+    parser.add_argument("--out-dir", default="window_descriptive_checks")
+    parser.add_argument("--date-col", default=None)
+    parser.add_argument("--src-col", default=None)
+    parser.add_argument("--dst-col", default=None)
+    parser.add_argument("--txid-col", default=None)
+    parser.add_argument("--label-node-col", default=None)
+    parser.add_argument("--label-col", default=None)
+    parser.add_argument("--scam-label", default="SCAM")
+    parser.add_argument("--chunksize", type=int, default=500000)
+    args = parser.parse_args()
+
+    tx_file = Path(args.tx_file)
+    out_dir = Path(args.out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    labeled_nodes, scam_nodes = load_labels(
+        Path(args.labels_csv) if args.labels_csv else None,
+        node_col=args.label_node_col,
+        label_col=args.label_col,
+        scam_label=args.scam_label,
+    )
+
+    tx_iter, chunked = load_tx_iter(tx_file, args.chunksize)
+
+    tx_rows_by_day: Counter[str] = Counter()
+    unique_tx_by_day: defaultdict[str, set[str]] = defaultdict(set)
+    active_accounts_by_day: defaultdict[str, set[str]] = defaultdict(set)
+    edges_by_day: defaultdict[str, set[tuple[str, str]]] = defaultdict(set)
+    scam_touch_by_day: Counter[str] = Counter()
+    labeled_touch_by_day: Counter[str] = Counter()
+    all_accounts_window: set[str] = set()
+
+    first_chunk = True
+    txid_col = None
+    src_col = None
+    dst_col = None
+    date_col = None
+
+    for chunk in tx_iter:
+        cols = list(chunk.columns)
+        if first_chunk:
+            date_col = detect_column(cols, DATE_CANDIDATES, args.date_col, required=True)
+            src_col = detect_column(cols, SRC_CANDIDATES, args.src_col, required=True)
+            dst_col = detect_column(cols, DST_CANDIDATES, args.dst_col, required=True)
+            txid_col = detect_column(cols, TXID_CANDIDATES, args.txid_col, required=False)
+            first_chunk = False
+
+        sub = chunk[[c for c in [date_col, src_col, dst_col, txid_col] if c is not None]].copy()
+        sub[date_col] = pd.to_datetime(sub[date_col], errors="coerce", utc=True).dt.date
+        sub = sub.dropna(subset=[date_col])
+        sub[src_col] = sub[src_col].astype(str)
+        sub[dst_col] = sub[dst_col].astype(str)
+        if txid_col is not None:
+            sub[txid_col] = sub[txid_col].astype(str)
+
+        for row in sub.itertuples(index=False):
+            day = str(getattr(row, date_col))
+            src = getattr(row, src_col)
+            dst = getattr(row, dst_col)
+            tx_rows_by_day[day] += 1
+            active_accounts_by_day[day].add(src)
+            active_accounts_by_day[day].add(dst)
+            edges_by_day[day].add((src, dst))
+            all_accounts_window.add(src)
+            all_accounts_window.add(dst)
+            if txid_col is not None:
+                unique_tx_by_day[day].add(getattr(row, txid_col))
+            if labeled_nodes:
+                if src in labeled_nodes or dst in labeled_nodes:
+                    labeled_touch_by_day[day] += 1
+                if src in scam_nodes or dst in scam_nodes:
+                    scam_touch_by_day[day] += 1
+
+    days = sorted(tx_rows_by_day.keys())
+    daily_rows = []
+    for day in days:
+        tx_count = tx_rows_by_day[day]
+        active_count = len(active_accounts_by_day[day])
+        edge_count = len(edges_by_day[day])
+        unique_tx_count = len(unique_tx_by_day[day]) if txid_col is not None else None
+        scam_touch = scam_touch_by_day[day]
+        labeled_touch = labeled_touch_by_day[day]
+        daily_rows.append({
+            "day": day,
+            "tx_row_count": tx_count,
+            "unique_tx_count": unique_tx_count,
+            "active_account_count": active_count,
+            "unique_edge_count": edge_count,
+            "scam_touch_tx_count": scam_touch if labeled_nodes else None,
+            "labeled_touch_tx_count": labeled_touch if labeled_nodes else None,
+            "scam_touch_share": (scam_touch / tx_count) if labeled_nodes and tx_count else None,
+            "labeled_touch_share": (labeled_touch / tx_count) if labeled_nodes and tx_count else None,
+        })
+    daily_df = pd.DataFrame(daily_rows)
+    daily_df.to_csv(out_dir / "daily_window_summary.csv", index=False)
+
+    total_tx = int(daily_df["tx_row_count"].sum())
+    total_unique_accounts_window = len(all_accounts_window)
+    busiest_day_idx = daily_df["tx_row_count"].idxmax()
+    busiest_active_idx = daily_df["active_account_count"].idxmax()
+
+    week_df = daily_df.copy()
+    week_df["day_dt"] = pd.to_datetime(week_df["day"])
+    week_df["iso_week"] = week_df["day_dt"].dt.strftime("%G-W%V")
+    week_grouped = week_df.groupby("iso_week", as_index=False).agg(
+        week_tx_rows=("tx_row_count", "sum"),
+        week_mean_active_accounts=("active_account_count", "mean"),
+    )
+    busiest_week_tx = int(week_grouped["week_tx_rows"].max()) if not week_grouped.empty else 0
+
+    concentration_df = pd.DataFrame([
+        {
+            "total_days": len(daily_df),
+            "total_tx_rows": total_tx,
+            "total_unique_accounts_window": total_unique_accounts_window,
+            "median_daily_tx_rows": float(daily_df["tx_row_count"].median()),
+            "median_daily_active_accounts": float(daily_df["active_account_count"].median()),
+            "busiest_day_by_tx": str(daily_df.loc[busiest_day_idx, "day"]),
+            "busiest_day_tx_rows": int(daily_df.loc[busiest_day_idx, "tx_row_count"]),
+            "busiest_day_tx_share": float(daily_df.loc[busiest_day_idx, "tx_row_count"] / total_tx) if total_tx else 0.0,
+            "busiest_day_by_active_accounts": str(daily_df.loc[busiest_active_idx, "day"]),
+            "busiest_day_active_accounts": int(daily_df.loc[busiest_active_idx, "active_account_count"]),
+            "busiest_day_active_share_of_window_unique": float(daily_df.loc[busiest_active_idx, "active_account_count"] / total_unique_accounts_window) if total_unique_accounts_window else 0.0,
+            "busiest_week_tx_rows": busiest_week_tx,
+            "busiest_week_tx_share": float(busiest_week_tx / total_tx) if total_tx else 0.0,
+        }
+    ])
+    concentration_df.to_csv(out_dir / "window_concentration_summary.csv", index=False)
+
+    # half-vs-half
+    split_idx = max(1, len(days) // 2)
+    first_days = set(days[:split_idx])
+    second_days = set(days[split_idx:])
+
+    half_rows = []
+    for half_name, half_days in [("first_half", first_days), ("second_half", second_days)]:
+        if not half_days:
+            continue
+        sub = daily_df[daily_df["day"].isin(half_days)].copy()
+        half_accounts = set()
+        half_edges = set()
+        for d in half_days:
+            half_accounts.update(active_accounts_by_day[d])
+            half_edges.update(edges_by_day[d])
+        half_rows.append({
+            "half": half_name,
+            "start_day": min(half_days),
+            "end_day": max(half_days),
+            "n_days": len(half_days),
+            "total_tx_rows": int(sub["tx_row_count"].sum()),
+            "mean_daily_tx_rows": float(sub["tx_row_count"].mean()),
+            "median_daily_tx_rows": float(sub["tx_row_count"].median()),
+            "mean_daily_active_accounts": float(sub["active_account_count"].mean()),
+            "median_daily_active_accounts": float(sub["active_account_count"].median()),
+            "unique_accounts_in_half": len(half_accounts),
+            "unique_edges_in_half": len(half_edges),
+            "total_scam_touch_tx_rows": int(sub["scam_touch_tx_count"].fillna(0).sum()) if "scam_touch_tx_count" in sub else None,
+            "total_labeled_touch_tx_rows": int(sub["labeled_touch_tx_count"].fillna(0).sum()) if "labeled_touch_tx_count" in sub else None,
+        })
+    pd.DataFrame(half_rows).to_csv(out_dir / "window_half_comparison.csv", index=False)
+
+    # plots
+    plot_df = daily_df.copy()
+    plot_df["day_dt"] = pd.to_datetime(plot_df["day"])
+
+    plt.figure(figsize=(10, 5))
+    plt.plot(plot_df["day_dt"], plot_df["tx_row_count"])
+    plt.xlabel("Day")
+    plt.ylabel("Transaction rows")
+    plt.title("Daily transaction count over the 48-day window")
+    plt.tight_layout()
+    plt.savefig(out_dir / "daily_tx_count.png", dpi=220)
+    plt.close()
+
+    plt.figure(figsize=(10, 5))
+    plt.plot(plot_df["day_dt"], plot_df["active_account_count"])
+    plt.xlabel("Day")
+    plt.ylabel("Active accounts")
+    plt.title("Daily active accounts over the 48-day window")
+    plt.tight_layout()
+    plt.savefig(out_dir / "daily_active_accounts.png", dpi=220)
+    plt.close()
+
+    fig, ax1 = plt.subplots(figsize=(11, 5))
+    ax1.plot(plot_df["day_dt"], plot_df["tx_row_count"])
+    ax1.set_xlabel("Day")
+    ax1.set_ylabel("Transaction rows")
+    ax2 = ax1.twinx()
+    ax2.plot(plot_df["day_dt"], plot_df["active_account_count"], linestyle="--")
+    ax2.set_ylabel("Active accounts")
+    plt.title("Window overview: daily transaction rows and active accounts")
+    fig.tight_layout()
+    fig.savefig(out_dir / "window_daily_activity_overview.png", dpi=220)
+    plt.close(fig)
+
+    note = [
+        "# Window descriptive note",
+        "",
+        "This script uses the existing 48-day raw transaction window only.",
+        "",
+        "Outputs:",
+        "- daily_window_summary.csv",
+        "- window_concentration_summary.csv",
+        "- window_half_comparison.csv",
+        "- daily_tx_count.png",
+        "- daily_active_accounts.png",
+        "- window_daily_activity_overview.png",
+        "",
+        "Interpretation:",
+        "- show that the window is active throughout the interval",
+        "- show whether one day or one week dominates too strongly",
+        "- show whether first half and second half are broadly comparable descriptively",
+        "",
+        "Do not overclaim temporal robustness from these outputs alone.",
+    ]
+    (out_dir / "window_descriptive_note.md").write_text("\n".join(note), encoding="utf-8")
+
+    print(f"Done: window descriptive checks saved under {out_dir}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+
 # 17. Minimal execution checklist
 
 1. Put the new files into the existing `helpers/` folder.
@@ -2193,6 +2531,8 @@ if __name__ == "__main__":
    - `python 13_summarize_threshold_stability.py`
    - `python 17_run_filter_ablation.py`
    - `python 19_build_review_artifact_pack.py`
+5. If the raw 48-day transaction file is readily available, run:
+   - `python 23_window_descriptive_checks.py --tx-file /ABS/PATH/TO/current_48d_transactions.csv --labels-csv /ABS/PATH/TO/labeled_nodes_in_graph.csv --out-dir ./window_descriptive_checks`
 5. Run outer-split pilot:
    - `python 14_run_outer_split_sensitivity.py --n-outer-splits 3`
    - `python 15_aggregate_outer_split_results.py`
